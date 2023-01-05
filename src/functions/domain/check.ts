@@ -24,7 +24,6 @@ const domainExistsInDatabase = await DomainModel.exists({
     return {
       isScam: false,
       domain: domain,
-      flattenedDomain: flattenedDomain,
       localDbNative: true,
     };
   }
@@ -190,7 +189,6 @@ const domainExistsInDatabase = await DomainModel.exists({
     return {
       isScam: true,
       domain: domain,
-      flattenedDomain: flattenedDomain,
       localDbNative: false,
       externalApiResponses: {
         walshyAPI: `${checkWalshyAPI.data}`,
@@ -206,7 +204,6 @@ const domainExistsInDatabase = await DomainModel.exists({
     return {
       isScam: false,
       domain: domain,
-      flattenedDomain: flattenedDomain,
       localDbNative: false,
       externalApiResponses: {
         walshyAPI: `${checkWalshyAPI.data}`,

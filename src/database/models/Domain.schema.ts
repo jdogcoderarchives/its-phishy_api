@@ -47,4 +47,4 @@ const domainSchema = new mongoose.Schema({
 });
 
 export { Domain };
-export const LinkModel = mongoose.model<Domain>("Domain", domainSchema);
+export const DomainModel = mongoose.model<Domain>("Domain", domainSchema);

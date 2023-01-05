@@ -1,33 +1,31 @@
 import * as express from "express";
-import { checkLink } from "../functions/link/check";
+import { checkDomain } from "../functions/domain/check";
 
 const router = express.Router();
 
 /**
- * GET /link/check
- * @summary Checks if a link is classified as something malicious (scam, phishing, etc.)
+ * GET /domain/check
+ * @summary Checks if a domain is classified as something malicious (scam, phishing, etc.)
  * @tags Main API Endpoints
  * @return {} 200 - success response - application/json
  * @return {object} 400 - Bad request response
- * @param {string} link.query.required - The link to check
+ * @param {string} domain.query.required - The domain to check
  */
 router.get("/check", async (req, res) => {
-  const url = req.query.link as string;
+  const url = req.query.domain as string;
 
-  const rsp = await checkLink(url);
+  const rsp = await checkDomain(url);
 
   if (rsp.isScam) {
     res.status(200).json({
       isScam: true,
-      link: rsp.link,
-      flattenedLink: rsp.flattenedLink,
+      domain: rsp.domain,
       localDbNative: rsp.localDbNative,
     });
   } else if (!rsp.isScam) {
     res.status(200).json({
       isScam: false,
-      link: rsp.link,
-      flattenedLink: rsp.flattenedLink,
+      domain: rsp.domain,
       localDbNative: rsp.localDbNative,
     });
   } else {
@@ -38,14 +36,14 @@ router.get("/check", async (req, res) => {
 });
 
 /**
- * GET /link/report
- * @summary Reports a link as something malicious (scam, phishing, etc.)
+ * GET /domain/report
+ * @summary Reports a domain as something malicious (scam, phishing, etc.)
  * @tags Main API Endpoints
  * @return {object} 200 - success response - application/json
  * @return {object} 400 - Bad request response
  */
 router.get("/report", (req, res) => {
-  res.send("Link report");
+  res.send("Domain report");
 });
 
 export default router;

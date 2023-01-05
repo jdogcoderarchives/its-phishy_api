@@ -5,6 +5,7 @@ import mongoose from "mongoose";
  * @typedef {object} Link
  * @property {string} id.required - The ID
  * @property {string} link.required - The link
+ * @property {string} flatLink.required - The flatLink
  * @property {string} type.required - The type
  * @property {string} reportedBy.required - The reportedBy
  * @property {string} reportedByID.required - The reportedByID
@@ -14,6 +15,7 @@ import mongoose from "mongoose";
 interface Link extends mongoose.Document {
   id: string;
   link: string;
+  flatLink: string;
   type: string;
   reportedBy: string;
   reportedByID: string;
@@ -29,6 +31,11 @@ const linkSchema = new mongoose.Schema({
   link: {
     type: String,
     required: [true, "Link is required"],
+    unique: true,
+  },
+  flatLink: {
+    type: String,
+    required: [true, "Flat Link is required"],
     unique: true,
   },
   reportedBy: {
