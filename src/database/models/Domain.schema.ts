@@ -1,34 +1,34 @@
 import mongoose from "mongoose";
 
 /**
- * A link type
- * @typedef {object} Link
+ * A domain type
+ * @typedef {object} Domain
  * @property {string} id.required - The ID
- * @property {string} link.required - The link
+ * @property {string} domain.required - The domain
  * @property {string} type.required - The type
  * @property {string} reportedBy.required - The reportedBy
  * @property {string} reportedByID.required - The reportedByID
  * @property {string} dateReported.required - The dateReported
  *
  */
-interface Link extends mongoose.Document {
+interface Domain extends mongoose.Document {
   id: string;
-  link: string;
+  domain: string;
   type: string;
   reportedBy: string;
   reportedByID: string;
   dateReported: Date;
 }
 
-const linkSchema = new mongoose.Schema({
+const domainSchema = new mongoose.Schema({
   id: {
     type: String,
     required: [true, "Link ID is required"],
     unique: true,
   },
-  link: {
+  domain: {
     type: String,
-    required: [true, "Link is required"],
+    required: [true, "Domain is required"],
     unique: true,
   },
   reportedBy: {
@@ -46,5 +46,5 @@ const linkSchema = new mongoose.Schema({
   },
 });
 
-export { Link };
-export const LinkModel = mongoose.model<Link>("Link", linkSchema);
+export { Domain };
+export const LinkModel = mongoose.model<Domain>("Domain", domainSchema);

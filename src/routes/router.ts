@@ -1,23 +1,48 @@
 import * as express from "express";
-import swaggerUi from "swagger-ui-express";
 
-import { apiSpecs } from "../functions/apiSpecs";
-import userRoutes from "./user/_index";
+import linkRoutes from "./link"
+import userRoutes from "./user";
 
 const router = express.Router();
 
+/**
+ * GET /
+ * @summary The Root endpoint, simply returns "Hello World!"
+ * @tags Main API Endpoints
+ * @return {object} 200 - success response - application/json
+ * @return {object} 400 - Bad request response
+ */
 router.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-// create a tos route
+/**
+ * GET /tos
+ * @summary This serves the terms of service page
+ * @tags Misc Endpoints
+ * @return {object} 200 - success response - application/json
+ * @return {object} 400 - Bad request response
+ */
 router.get("/tos", (req, res) => {
-  // send a pretty html tos page
-  res.send("Hello World!");
+  // send the file, located in src/public/html/tos.html
+  res.sendFile("tos.html", { root: "./src/public/html" });
 });
 
-router.use("/docs", swaggerUi.serve, swaggerUi.setup(apiSpecs));
+/**
+ * GET /privacy
+ * @summary This serves the privacy policy page
+ * @tags Misc Endpoints
+ * @return {object} 200 - success response - application/json
+ * @return {object} 400 - Bad request response
+ */
+router.get("/privacy", (req, res) => {
+  // send the file, located in src/public/html/privacy.html, with the css styling applied
+  res.sendFile("privacy.html", { root: "./src/public/html" });
+});
+
 
 router.use("/user", userRoutes);
+router.use("/link", linkRoutes);
+
 
 export default router;

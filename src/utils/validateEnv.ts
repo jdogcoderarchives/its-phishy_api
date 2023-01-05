@@ -5,8 +5,16 @@ export const validateEnv = (): { valid: boolean; message: string } => {
     return { valid: false, message: "Missing Node Env" };
   }
 
-  if (!process.env.PORT) {
-    return { valid: false, message: "Missing Port" };
+  if (!process.env.API_PORT) {
+    return { valid: false, message: "Missing API Port" };
+  }
+
+  if (!process.env.GOOGLE_CLOUD_PROJECT_ID) {
+    return { valid: false, message: "Missing Google Cloud Project ID" };
+  }
+
+  if (!process.env.GOOGLE_CLOUD_ERROR_REPORTING_API_KEY) {
+    return { valid: false, message: "Missing Google Cloud Error Reporting API Key" };
   }
 
   if (!process.env.MONGO_URI) {
@@ -25,10 +33,6 @@ export const validateEnv = (): { valid: boolean; message: string } => {
     return { valid: false, message: "Missing Phisherman API Key" };
   }
 
-  if (!process.env.PHISH_REPORT_API_KEY) {
-    return { valid: false, message: "Missing Phish Report API Key" };
-  }
-
   if (!process.env.URLSCAN_API_KEY) {
     return { valid: false, message: "Missing URLScan API Key" };
   }
@@ -37,11 +41,7 @@ export const validateEnv = (): { valid: boolean; message: string } => {
     return { valid: false, message: "Missing Virus Total API Key" };
   }
 
-  if (!process.env.CHECK_PHISH_API_KEY ) {
-    return { valid: false, message: "Missing Check Phish API Key" };
-  }
-
-  if (process.env.IP_QUALITY_SCORE_API_KEY) {
+  if (!process.env.IP_QUALITY_SCORE_API_KEY) {
     return { valid: false, message: "Missing ipQualityScore API Key" };
   }
 

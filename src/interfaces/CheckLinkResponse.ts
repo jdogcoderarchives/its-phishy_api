@@ -1,4 +1,3 @@
-// create a CheckLinkResponse interface
 export interface CheckLinkResponse {
   isScam: boolean;
   link: string;
@@ -6,7 +5,6 @@ export interface CheckLinkResponse {
   localDbNative: boolean;
   externalApiResponses?: {
     walshyAPI: string;
-    checkPhishAPI: string;
     googleSafeBrowsingAPI: string;
     ipQualityScoreAPI: string;
     phishermanAPI: string;

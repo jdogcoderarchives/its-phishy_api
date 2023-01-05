@@ -1,24 +1,15 @@
 import * as mongoose from "mongoose";
 
 /**
- * @openapi
- * definitions:
- *   User:
- *     type: object
- *     properties:
- *       id:
- *         type: string
- *       name:
- *         type: string
- *       email:
- *         type: string
- *       password:
- *         type: string
- *       accountType:
- *         type: string
- *       date_created:
- *         type: string
- *         format: date
+ * A user type
+ * @typedef {object} User
+ * @property {string} id.required - The ID
+ * @property {string} name.required - The name
+ * @property {string} email.required - The email
+ * @property {string} password.required - The password
+ * @property {string} accountType.required - The accountType
+ * @property {string} dateCreated.required - The dateCreated
+ *
  */
 interface User extends mongoose.Document {
   id: string;

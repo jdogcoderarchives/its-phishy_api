@@ -10,7 +10,7 @@
     "noImplicitAny": true,
     "rootDir": "src",
     "outDir": "dist",
-    "typeRoots": ["node_modules/@types"]
+    "typeRoots": ["node_modules/@types", "node_modules/openapi-types"]
   },
   "exclude": ["node_modules", "dist"] /* Exclude files from compilation. */
 }

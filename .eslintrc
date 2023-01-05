@@ -45,11 +45,11 @@
       "no-param-reassign": [
         "error"
       ],
-      "import/first": "error",
-      "import/exports-last": "error",
-      "import/newline-after-import": "error",
+      "import/first": "warn",
+      "import/exports-last": "warn",
+      "import/newline-after-import": "warn",
       "import/order": [
-        "error",
+        "warn",
         {
           "groups": [
             "builtin",

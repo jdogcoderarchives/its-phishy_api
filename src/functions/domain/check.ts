@@ -1,29 +1,30 @@
 import axios from "axios";
 
-import { LinkModel } from "../../database/models/Link.schema";
-import { CheckLinkResponse } from "../../interfaces/CheckLinkResponse";
+import { DomainModel } from "../../database/models/Domain.schema";
+import { CheckDomainResponse } from "../../interfaces/CheckDomainResponse";
+import { flattenLink } from "../flattenLink";
 
-export async function checkLink(link: string): Promise<CheckLinkResponse> {
+export async function checkDomain(domain: string): Promise<CheckDomainResponse> {
 
- if (!link) {
-    throw new Error("No link provided");
+ if (!domain) {
+    throw new Error("No domain provided");
   }
 
-  const flattenedLink = link
+  const flattenedDomain = flattenLink(domain)
 
-  if (!flattenedLink) {
-    throw new Error("No link provided");
+  if (!flattenedDomain) {
+    throw new Error("No domain provided");
   }
 
-const linkExistsInDatabase = await LinkModel.exists({
-    link: flattenedLink,
+const domainExistsInDatabase = await DomainModel.exists({
+    domain: flattenedDomain,
   });
 
-  if (linkExistsInDatabase) {
+  if (domainExistsInDatabase) {
     return {
       isScam: false,
-      link: link,
-      flattenedLink: flattenedLink,
+      domain: domain,
+      flattenedDomain: flattenedDomain,
       localDbNative: true,
     };
   }
@@ -32,7 +33,7 @@ const linkExistsInDatabase = await LinkModel.exists({
     badDomain: boolean;
     detection: "discord" | "community";
   }>("https://bad-domains.walshy.dev/check", {
-    domain: flattenedLink,
+    domain: flattenedDomain,
   });
 
   const gooleSafeBrowsingResponse = await axios.post(
@@ -48,7 +49,7 @@ const linkExistsInDatabase = await LinkModel.exists({
         threatEntryTypes: ["URL"],
         threatEntries: [
           {
-            url: flattenedLink,
+            url: flattenedDomain,
           },
         ],
       },
@@ -56,7 +57,7 @@ const linkExistsInDatabase = await LinkModel.exists({
   );
 
   const ipQualityScoreResponse = await axios.get(
-    `https://ipqualityscore.com/api/json/url/${process.env.IP_QUALITY_SCORE_API_KEY}/${flattenedLink}`,
+    `https://ipqualityscore.com/api/json/url/${process.env.IP_QUALITY_SCORE_API_KEY}/${flattenedDomain}`,
     {
       headers: {
         Referer: "https://api.itsfishy.xyz",
@@ -65,7 +66,7 @@ const linkExistsInDatabase = await LinkModel.exists({
   );
 
   const phishermanResponse = await axios.get(
-    `https://api.phisherman.gg/v2/domains/check/${flattenedLink}`,
+    `https://api.phisherman.gg/v2/domains/check/${flattenedDomain}`,
     {
       headers: {
         Authorization: "Bearer " + process.env.PHISHERMAN_API_KEY,
@@ -75,7 +76,7 @@ const linkExistsInDatabase = await LinkModel.exists({
   );
 
   const sinkingYahtsResponse = await axios.get<boolean>(
-    `https://phish.sinking.yachts/v2/check/${flattenedLink}`,
+    `https://phish.sinking.yachts/v2/check/${flattenedDomain}`,
     {
       headers: {
         accept: "application/json",
@@ -85,11 +86,11 @@ const linkExistsInDatabase = await LinkModel.exists({
   );
 
   const spenTkResponse = await axios.get(
-    `https://spen.tk/api/v1/isScamLink?link=${flattenedLink}`
+    `https://spen.tk/api/v1/isScamDomain?domain=${flattenedDomain}`
   );
 
   const urlScanCheckSerch = await axios.get(
-    `https://urlscan.io/api/v1/search/?q=domain:${flattenedLink}`,
+    `https://urlscan.io/api/v1/search/?q=domain:${flattenedDomain}`,
     {
       headers: {
         "API-Key": process.env.URLSCAN_API_KEY,
@@ -109,13 +110,13 @@ const linkExistsInDatabase = await LinkModel.exists({
     throw new Error("urlScanCheckSerch.data.results is undefined");
   }
 
-  // check if the link is not already scanned
+  // check if the domain is not already scanned
   if (urlScanCheckSerch.data.results.length === 0) {
-    // if not scan the link, providing the api key
+    // if not scan the domain, providing the api key
     const scan = await axios.post(
       "https://urlscan.io/api/v1/scan/",
       {
-        url: flattenedLink,
+        url: flattenedDomain,
       },
       {
         headers: {
@@ -153,7 +154,7 @@ const linkExistsInDatabase = await LinkModel.exists({
   }
 
   const checkVirusTotalAPI = await axios.get(
-    `https://www.virustotal.com/api/v3/domains/${flattenedLink}`,
+    `https://www.virustotal.com/api/v3/domains/${flattenedDomain}`,
     {
       headers: {
         "x-apikey": process.env.VIRUS_TOTAL_API_KEY,
@@ -188,8 +189,8 @@ const linkExistsInDatabase = await LinkModel.exists({
   ) {
     return {
       isScam: true,
-      link: link,
-      flattenedLink: flattenedLink,
+      domain: domain,
+      flattenedDomain: flattenedDomain,
       localDbNative: false,
       externalApiResponses: {
         walshyAPI: `${checkWalshyAPI.data}`,
@@ -204,8 +205,8 @@ const linkExistsInDatabase = await LinkModel.exists({
   } else {
     return {
       isScam: false,
-      link: link,
-      flattenedLink: flattenedLink,
+      domain: domain,
+      flattenedDomain: flattenedDomain,
       localDbNative: false,
       externalApiResponses: {
         walshyAPI: `${checkWalshyAPI.data}`,

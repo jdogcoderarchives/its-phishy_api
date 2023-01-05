@@ -2,10 +2,19 @@ import * as bcrypt from "bcrypt";
 import * as express from "express";
 import * as jwt from "jsonwebtoken";
 
-import { UserModel } from "../../database/models/User.schema";
+import { UserModel } from "../database/models/User.schema";
 
 const router = express.Router();
 
+/**
+ * GET /user/signup
+ * @summary This endpoint is used to sign up a new user.
+ * @tags Authentication Endpoints
+ * @param {string} email.query.required - email of the user
+ * @param {string} password.query.required - password of the user
+ * @return {object} 200 - success response - application/json
+ * @return {object} 400 - Bad request response
+ */
 router.post("/signup", async (req, res) => {
   try {
     // Validate the request body
