@@ -85,7 +85,7 @@ const domainExistsInDatabase = await DomainModel.exists({
   );
 
   const spenTkResponse = await axios.get(
-    `https://spen.tk/api/v1/isScamDomain?domain=${flattenedDomain}`
+    `https://spen.tk/api/v1/isScamLink?link=${flattenedDomain}`,
   );
 
   const urlScanCheckSerch = await axios.get(
