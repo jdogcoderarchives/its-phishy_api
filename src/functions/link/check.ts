@@ -1,21 +1,21 @@
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 
 import { LinkModel } from "../../database/models/Link.schema";
 import { CheckLinkResponse } from "../../interfaces/CheckLinkResponse";
 
 export async function checkLink(link: string): Promise<CheckLinkResponse> {
-
- if (!link) {
+  if (!link) {
     throw new Error("No link provided");
   }
 
-  const flattenedLink = link
+  const flattenedLink = link;
 
   if (!flattenedLink) {
     throw new Error("No link provided");
   }
 
-const linkExistsInDatabase = await LinkModel.exists({
+  const linkExistsInDatabase = await LinkModel.exists({
     link: flattenedLink,
   });
 
@@ -169,7 +169,6 @@ const linkExistsInDatabase = await LinkModel.exists({
     throw new Error("ipQualityScoreResponse.data is undefined");
   }
 
-
   if (
     checkWalshyAPI.data.badDomain ||
     // if googlesafebrowsing does not return an empty object
@@ -186,6 +185,15 @@ const linkExistsInDatabase = await LinkModel.exists({
       checkVirusTotalAPI.data.data.attributes.last_analysis_stats.suspicious >=
       2
   ) {
+    const newLink = new LinkModel({
+      id: uuidv4(),
+      link: link,
+      flatLink: flattenedLink,
+      dateReported: new Date(),
+    });
+
+    await newLink.save();
+
     return {
       isScam: true,
       link: link,

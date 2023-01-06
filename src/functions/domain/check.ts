@@ -1,22 +1,24 @@
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 
 import { DomainModel } from "../../database/models/Domain.schema";
 import { CheckDomainResponse } from "../../interfaces/CheckDomainResponse";
 import { flattenLink } from "../flattenLink";
 
-export async function checkDomain(domain: string): Promise<CheckDomainResponse> {
-
- if (!domain) {
+export async function checkDomain(
+  domain: string
+): Promise<CheckDomainResponse> {
+  if (!domain) {
     throw new Error("No domain provided");
   }
 
-  const flattenedDomain = flattenLink(domain)
+  const flattenedDomain = flattenLink(domain);
 
   if (!flattenedDomain) {
     throw new Error("No domain provided");
   }
 
-const domainExistsInDatabase = await DomainModel.exists({
+  const domainExistsInDatabase = await DomainModel.exists({
     domain: flattenedDomain,
   });
 
@@ -85,7 +87,7 @@ const domainExistsInDatabase = await DomainModel.exists({
   );
 
   const spenTkResponse = await axios.get(
-    `https://spen.tk/api/v1/isScamLink?link=${flattenedDomain}`,
+    `https://spen.tk/api/v1/isScamLink?link=${flattenedDomain}`
   );
 
   const urlScanCheckSerch = await axios.get(
@@ -169,7 +171,6 @@ const domainExistsInDatabase = await DomainModel.exists({
     throw new Error("ipQualityScoreResponse.data is undefined");
   }
 
-
   if (
     checkWalshyAPI.data.badDomain ||
     // if googlesafebrowsing does not return an empty object
@@ -186,6 +187,14 @@ const domainExistsInDatabase = await DomainModel.exists({
       checkVirusTotalAPI.data.data.attributes.last_analysis_stats.suspicious >=
       2
   ) {
+    const newDomain = new DomainModel({
+      id: uuidv4(),
+      domain: domain,
+      dateReported: new Date(),
+    });
+
+    await newDomain.save();
+
     return {
       isScam: true,
       domain: domain,
