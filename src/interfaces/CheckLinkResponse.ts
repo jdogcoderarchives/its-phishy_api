@@ -9,7 +9,6 @@ export interface CheckLinkResponse {
     ipQualityScoreAPI: string;
     phishermanAPI: string;
     sinkingYahtsAPI: string;
-    spenTkAPI: string;
     urlScanAPI: string;
   };
 }

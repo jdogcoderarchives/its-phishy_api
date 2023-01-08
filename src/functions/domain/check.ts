@@ -86,10 +86,6 @@ export async function checkDomain(
     }
   );
 
-  const spenTkResponse = await axios.get(
-    `https://spen.tk/api/v1/isScamLink?link=${flattenedDomain}`
-  );
-
   const urlScanCheckSerch = await axios.get(
     `https://urlscan.io/api/v1/search/?q=domain:${flattenedDomain}`,
     {
@@ -181,7 +177,6 @@ export async function checkDomain(
     ipQualityScoreResponse.data.malware ||
     phishermanResponse.data.verifiedPhish ||
     sinkingYahtsResponse.data ||
-    spenTkResponse.data.result ||
     urlScanResponse.data.verdicts.malicious ||
     checkVirusTotalAPI.data.data.attributes.last_analysis_stats.malicious +
       checkVirusTotalAPI.data.data.attributes.last_analysis_stats.suspicious >=
@@ -205,7 +200,6 @@ export async function checkDomain(
         ipQualityScoreAPI: `${ipQualityScoreResponse.data}`,
         phishermanAPI: `${phishermanResponse.data}`,
         sinkingYahtsAPI: `${sinkingYahtsResponse.data}`,
-        spenTkAPI: `${spenTkResponse.data}`,
         urlScanAPI: `${urlScanResponse.data}`,
       },
     };
@@ -220,7 +214,6 @@ export async function checkDomain(
         ipQualityScoreAPI: `${ipQualityScoreResponse.data}`,
         phishermanAPI: `${phishermanResponse.data}`,
         sinkingYahtsAPI: `${sinkingYahtsResponse.data}`,
-        spenTkAPI: `${spenTkResponse.data}`,
         urlScanAPI: `${urlScanResponse.data}`,
       },
     };

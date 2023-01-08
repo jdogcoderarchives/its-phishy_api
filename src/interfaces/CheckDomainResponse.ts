@@ -8,7 +8,6 @@ export interface CheckDomainResponse {
     ipQualityScoreAPI: string;
     phishermanAPI: string;
     sinkingYahtsAPI: string;
-    spenTkAPI: string;
     urlScanAPI: string;
   };
 }
