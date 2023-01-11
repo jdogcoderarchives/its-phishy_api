@@ -1,7 +1,7 @@
 import * as express from "express";
 
 import domainRoutes from "./domain";
-import linkRoutes from "./link"
+import linkRoutes from "./link";
 import userRoutes from "./user";
 
 const router = express.Router();
@@ -41,10 +41,8 @@ router.get("/privacy", (req, res) => {
   res.sendFile("privacy.html", { root: "./src/public/html" });
 });
 
-
 router.use("/user", userRoutes);
 router.use("/link", linkRoutes);
 router.use("/domain", domainRoutes);
-
 
 export default router;

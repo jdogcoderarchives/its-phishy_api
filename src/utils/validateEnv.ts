@@ -17,6 +17,10 @@ export const validateEnv = (): { valid: boolean; message: string } => {
     return { valid: false, message: "Missing Google Cloud Error Reporting API Key" };
   }
 
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return { valid: false, message: "Missing Stripe Secret Key" };
+  }
+
   if (!process.env.MONGO_URI) {
     return { valid: false, message: "Missing Mongo URI" };
   }

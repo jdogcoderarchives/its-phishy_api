@@ -7,7 +7,7 @@ import * as mongoose from "mongoose";
  * @property {string} name.required - The name
  * @property {string} email.required - The email
  * @property {string} password.required - The password
- * @property {string} accountType.required - The accountType
+ * @property {string} plan.required - The plan that the user is subscribed to
  * @property {string} dateCreated.required - The dateCreated
  *
  */
@@ -16,7 +16,7 @@ interface User extends mongoose.Document {
   name: string;
   email: string;
   password: string;
-  accountType: string;
+  plan: string;
   date_created: Date;
 }
 
@@ -39,11 +39,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Password is required"],
   },
-  accountType: {
+  plan: {
     type: String,
-    enum: ["user", "bot", "admin"],
-    default: "user",
-    required: [true, "Account type is required"],
+    enum: ["base", "personal", "buisness", "enterprise"],
+    default: "base",
+    required: [true, "Plan is required"],
   },
   dateCreated: {
     type: Date,

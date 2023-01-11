@@ -201,6 +201,7 @@ export async function checkDomain(
         phishermanAPI: `${phishermanResponse.data}`,
         sinkingYahtsAPI: `${sinkingYahtsResponse.data}`,
         urlScanAPI: `${urlScanResponse.data}`,
+        virusTotalAPI: `${checkVirusTotalAPI.data}`,
       },
     };
   } else {
@@ -215,6 +216,7 @@ export async function checkDomain(
         phishermanAPI: `${phishermanResponse.data}`,
         sinkingYahtsAPI: `${sinkingYahtsResponse.data}`,
         urlScanAPI: `${urlScanResponse.data}`,
+        virusTotalAPI: `${checkVirusTotalAPI.data}`,
       },
     };
   }

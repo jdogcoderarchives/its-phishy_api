@@ -9,5 +9,6 @@ export interface CheckDomainResponse {
     phishermanAPI: string;
     sinkingYahtsAPI: string;
     urlScanAPI: string;
+    virusTotalAPI: string;
   };
 }

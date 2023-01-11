@@ -1,29 +1,16 @@
 import { createServer } from "http";
-import { ErrorReporting } from "@google-cloud/error-reporting";
-import bodyParser from "body-parser";
-import cors from "cors";
-import express, { Application } from "express";
-import expressJSDocSwagger from "express-jsdoc-swagger";
-import helmet from "helmet";
 import mongoose from "mongoose";
 import { Server } from "socket.io";
 import "dotenv/config";
 
-import { swaggerOptions } from "./config/swaggerOptions";
+import app from "./app";
 import { LinkModel } from "./database/models/Link.schema";
-import errorHandlerMiddleware from "./middleware/error-handler";
-import router from "./routes/router";
 import * as logger from "./utils/logger";
 import { validateEnv } from "./utils/validateEnv";
 
 const API_PORT = process.env.API_PORT;
 
 void (async () => {
-  const errors = new ErrorReporting({
-    projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
-    key: process.env.GOOGLE_CLOUD_ERROR_REPORTING_API_KEY,
-  });
-
   const validatedEnvironment = validateEnv();
   if (!validatedEnvironment.valid) {
     logger.error(validatedEnvironment.message);
@@ -46,29 +33,6 @@ void (async () => {
   mongoose.connection.on("error", (err) => {
     logger.error(err);
   });
-
-  const app: Application = express();
-
-  expressJSDocSwagger(app)(swaggerOptions);
-
-  app.use(errors.express);
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: false }));
-  app.use(
-    helmet({
-      referrerPolicy: false,
-    })
-  );
-  app.use(bodyParser.json({}));
-  app.use(
-    cors({
-      origin: "*",
-    })
-  );
-
-  app.use(errorHandlerMiddleware);
-
-  app.use("/", router);
 
   const httpServer = createServer(app);
   const io = new Server(httpServer, {

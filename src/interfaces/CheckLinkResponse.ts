@@ -10,5 +10,6 @@ export interface CheckLinkResponse {
     phishermanAPI: string;
     sinkingYahtsAPI: string;
     urlScanAPI: string;
+    virusTotalAPI: string;
   };
 }

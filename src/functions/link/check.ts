@@ -201,6 +201,7 @@ export async function checkLink(link: string): Promise<CheckLinkResponse> {
         phishermanAPI: `${phishermanResponse.data}`,
         sinkingYahtsAPI: `${sinkingYahtsResponse.data}`,
         urlScanAPI: `${urlScanResponse.data}`,
+        virusTotalAPI: `${checkVirusTotalAPI.data}`,
       },
     };
   } else {
@@ -216,6 +217,7 @@ export async function checkLink(link: string): Promise<CheckLinkResponse> {
         phishermanAPI: `${phishermanResponse.data}`,
         sinkingYahtsAPI: `${sinkingYahtsResponse.data}`,
         urlScanAPI: `${urlScanResponse.data}`,
+        virusTotalAPI: `${checkVirusTotalAPI.data}`,
       },
     };
   }
