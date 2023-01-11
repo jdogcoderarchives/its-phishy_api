@@ -1,3 +1,6 @@
+/**
+ * The response from the checkDomain function/endpoint
+ */
 export interface CheckDomainResponse {
   isScam: boolean;
   domain: string;

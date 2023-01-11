@@ -1,3 +1,6 @@
+/**
+ * The response from the checkLink function/endpoint
+ */
 export interface CheckLinkResponse {
   isScam: boolean;
   link: string;

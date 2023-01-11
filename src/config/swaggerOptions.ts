@@ -1,3 +1,6 @@
+/**
+ * Swagger Options, used to configure the swagger-ui-express package
+ */
 export const swaggerOptions = {
   openapi: "3.0.0",
   info: {

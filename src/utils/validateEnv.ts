@@ -1,5 +1,7 @@
-// create a validateEnv function that returns true or false
-
+/**
+ * A function to validate the environment variables, and makes sure they are set.
+ * @returns valid: boolean, message: string
+ */
 export const validateEnv = (): { valid: boolean; message: string } => {
   if (!process.env.NODE_ENV) {
     return { valid: false, message: "Missing Node Env" };
@@ -14,7 +16,10 @@ export const validateEnv = (): { valid: boolean; message: string } => {
   }
 
   if (!process.env.GOOGLE_CLOUD_ERROR_REPORTING_API_KEY) {
-    return { valid: false, message: "Missing Google Cloud Error Reporting API Key" };
+    return {
+      valid: false,
+      message: "Missing Google Cloud Error Reporting API Key",
+    };
   }
 
   if (!process.env.STRIPE_SECRET_KEY) {

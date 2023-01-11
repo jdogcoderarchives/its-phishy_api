@@ -4,6 +4,11 @@ import { v4 as uuidv4 } from "uuid";
 import { LinkModel } from "../../database/models/Link.schema";
 import { CheckLinkResponse } from "../../interfaces/CheckLinkResponse";
 
+/**
+ * Checks various APIs to see if a link is a scam
+ * @param {string} link The link to check
+ * @returns {Promise<CheckLinkResponse>} The response
+ */
 export async function checkLink(link: string): Promise<CheckLinkResponse> {
   if (!link) {
     throw new Error("No link provided");

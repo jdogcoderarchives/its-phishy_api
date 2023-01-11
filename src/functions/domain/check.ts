@@ -5,6 +5,11 @@ import { DomainModel } from "../../database/models/Domain.schema";
 import { CheckDomainResponse } from "../../interfaces/CheckDomainResponse";
 import { flattenLink } from "../flattenLink";
 
+/**
+ * Checks various APIs to see if a domain is a scam
+ * @param {string} domain The domain to check
+ * @returns {Promise<CheckDomainResponse>} The response
+ */
 export async function checkDomain(
   domain: string
 ): Promise<CheckDomainResponse> {

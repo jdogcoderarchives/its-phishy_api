@@ -1,6 +1,7 @@
 /**
- *
- * @param link
+ * Flattens link down to root. (domain)
+ * @param {string} link The link to flatten
+ * @returns {string} The flattened link (domain)
  */
 export function flattenLink(link: string): string {
   if (!link) {

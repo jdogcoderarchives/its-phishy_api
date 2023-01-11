@@ -37,7 +37,7 @@ const domainSchema = new mongoose.Schema({
   },
   reportedByID: {
     type: String,
-// required: [true, "Reported By ID is required"],
+    // required: [true, "Reported By ID is required"],
   },
   dateReported: {
     type: Date,

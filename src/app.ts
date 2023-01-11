@@ -27,5 +27,4 @@ app.use(
 
 app.use("/", router);
 
-
 export default app;

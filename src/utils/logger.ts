@@ -2,15 +2,27 @@ import { ErrorReporting } from "@google-cloud/error-reporting";
 import colors from "colors";
 import moment from "moment";
 
-
 const errors = new ErrorReporting({
   projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
   key: process.env.GOOGLE_CLOUD_ERROR_REPORTING_API_KEY,
 });
 
+/**
+ * Logger function, to beutify the console logs
+ * @param content
+ * @param type
+ */
 export const log = (
   content: string,
-  type: "log" | "plain" | "info" | "warn" | "error" | "debug" | "db" | "ready" = "log"
+  type:
+    | "log"
+    | "plain"
+    | "info"
+    | "warn"
+    | "error"
+    | "debug"
+    | "db"
+    | "ready" = "log"
 ) => {
   const timestamp = `${colors.white(`[${moment().format("DD-MM-YY H:m:s")}]`)}`;
 

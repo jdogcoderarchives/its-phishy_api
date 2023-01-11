@@ -1,4 +1,6 @@
-// define rateLimits as an array of objects. Each object has a plan name, minute, hour, and day limit
+/**
+ * Rate limit definitions
+ */
 export const rateLimits = [
   {
     plan: "base",
