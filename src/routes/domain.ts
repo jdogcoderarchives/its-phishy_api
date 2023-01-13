@@ -1,5 +1,8 @@
 import * as express from "express";
+import validator from "validator";
+
 import { checkDomain } from "../functions/domain/check";
+import { flattenLink } from "../functions/flattenLink";
 
 const router = express.Router();
 
@@ -9,10 +12,37 @@ const router = express.Router();
  * @tags Main API Endpoints
  * @return {} 200 - success response - application/json
  * @return {object} 400 - Bad request response
+ * @return {object} 449 - Missing parameters response
+ * @return {object} 500 - Internal server error response
  * @param {string} domain.query.required - The domain to check
  */
 router.get("/check", async (req, res) => {
-  const url = req.query.domain as string;
+  const rawDomain = req.query.domain as string;
+
+  if (!rawDomain) {
+    return res.status(449).json({
+      error: "No domain provided",
+    });
+  }
+
+  let url = null;
+
+  if (validator.isFQDN(rawDomain)) {
+    url = rawDomain;
+  } else if (validator.isURL(rawDomain)) {
+    url = flattenLink(rawDomain);
+  } else {
+    return res.status(400).json({
+      error: "Domain is not a valid FQDN (e.g. domain.com)",
+    });
+  }
+
+
+  if (url === null || url === undefined || !url) {
+    return res.status(500).json({
+      error: "Something went wrong",
+    });
+  }
 
   const rsp = await checkDomain(url);
 
@@ -20,6 +50,7 @@ router.get("/check", async (req, res) => {
     res.status(200).json({
       isScam: true,
       domain: rsp.domain,
+      reason: rsp.reason,
       localDbNative: rsp.localDbNative,
     });
   } else if (!rsp.isScam) {
@@ -33,17 +64,6 @@ router.get("/check", async (req, res) => {
       error: "Something went wrong",
     });
   }
-});
-
-/**
- * GET /domain/report
- * @summary Reports a domain as something malicious (scam, phishing, etc.)
- * @tags Main API Endpoints
- * @return {object} 200 - success response - application/json
- * @return {object} 400 - Bad request response
- */
-router.get("/report", (req, res) => {
-  res.send("Domain report");
 });
 
 export default router;

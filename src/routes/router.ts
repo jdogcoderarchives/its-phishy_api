@@ -1,7 +1,10 @@
 import * as express from "express";
 
+// import { rateLimiterMiddleware } from "../middleware/rateLimitController";
 import domainRoutes from "./domain";
+import emailRoutes from "./email";
 import linkRoutes from "./link";
+import phoneNumberRoutes from "./phoneNumber";
 import userRoutes from "./user";
 
 const router = express.Router();
@@ -44,5 +47,7 @@ router.get("/privacy", (req, res) => {
 router.use("/user", userRoutes);
 router.use("/link", linkRoutes);
 router.use("/domain", domainRoutes);
+router.use("/email", emailRoutes);
+router.use("/phonenumber", phoneNumberRoutes);
 
 export default router;

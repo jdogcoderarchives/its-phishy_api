@@ -1,9 +1,9 @@
 import * as mongoose from "mongoose";
 
 /**
- * A user type
+ * The model for a user record
  * @typedef {object} User
- * @property {string} id.required - The ID
+ * @property {string} id.required - The ID of the record (generated automatically)
  * @property {string} name.required - The name
  * @property {string} email.required - The email
  * @property {string} password.required - The password

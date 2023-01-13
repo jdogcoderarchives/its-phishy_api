@@ -2,17 +2,16 @@ import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 
 import { DomainModel } from "../../database/models/Domain.schema";
-import { CheckDomainResponse } from "../../interfaces/CheckDomainResponse";
 import { flattenLink } from "../flattenLink";
 
 /**
  * Checks various APIs to see if a domain is a scam
  * @param {string} domain The domain to check
- * @returns {Promise<CheckDomainResponse>} The response
+ * @returns {Promise} The response
  */
 export async function checkDomain(
   domain: string
-): Promise<CheckDomainResponse> {
+) {
   if (!domain) {
     throw new Error("No domain provided");
   }
@@ -32,6 +31,7 @@ export async function checkDomain(
       isScam: false,
       domain: domain,
       localDbNative: true,
+      reason: "Link exists in native database!",
     };
   }
 
@@ -190,6 +190,10 @@ export async function checkDomain(
     const newDomain = new DomainModel({
       id: uuidv4(),
       domain: domain,
+      type: "Unclassified",
+      reason: "Flagged by external APIs",
+      reportedBy: "Internal || Checks Endpoint",
+      reportedByID: "000",
       dateReported: new Date(),
     });
 
@@ -198,6 +202,7 @@ export async function checkDomain(
     return {
       isScam: true,
       domain: domain,
+      reason: "Flagged by external APIs",
       localDbNative: false,
       externalApiResponses: {
         walshyAPI: `${checkWalshyAPI.data}`,

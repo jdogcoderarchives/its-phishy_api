@@ -2,14 +2,13 @@ import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 
 import { LinkModel } from "../../database/models/Link.schema";
-import { CheckLinkResponse } from "../../interfaces/CheckLinkResponse";
 
 /**
  * Checks various APIs to see if a link is a scam
  * @param {string} link The link to check
- * @returns {Promise<CheckLinkResponse>} The response
+ * @returns {Promise} The response
  */
-export async function checkLink(link: string): Promise<CheckLinkResponse> {
+export async function checkLink(link: string) {
   if (!link) {
     throw new Error("No link provided");
   }
@@ -17,11 +16,11 @@ export async function checkLink(link: string): Promise<CheckLinkResponse> {
   const flattenedLink = link;
 
   if (!flattenedLink) {
-    throw new Error("No link provided");
+    throw new Error("Flat link issue");
   }
 
   const linkExistsInDatabase = await LinkModel.exists({
-    link: flattenedLink,
+    link: link,
   });
 
   if (linkExistsInDatabase) {
@@ -30,6 +29,7 @@ export async function checkLink(link: string): Promise<CheckLinkResponse> {
       link: link,
       flattenedLink: flattenedLink,
       localDbNative: true,
+      reason: "Link exists in native database!",
     };
   }
 
@@ -37,7 +37,7 @@ export async function checkLink(link: string): Promise<CheckLinkResponse> {
     badDomain: boolean;
     detection: "discord" | "community";
   }>("https://bad-domains.walshy.dev/check", {
-    domain: flattenedLink,
+    domain: link,
   });
 
   const gooleSafeBrowsingResponse = await axios.post(
@@ -53,7 +53,7 @@ export async function checkLink(link: string): Promise<CheckLinkResponse> {
         threatEntryTypes: ["URL"],
         threatEntries: [
           {
-            url: flattenedLink,
+            url: link,
           },
         ],
       },
@@ -61,7 +61,7 @@ export async function checkLink(link: string): Promise<CheckLinkResponse> {
   );
 
   const ipQualityScoreResponse = await axios.get(
-    `https://ipqualityscore.com/api/json/url/${process.env.IP_QUALITY_SCORE_API_KEY}/${flattenedLink}`,
+    `https://ipqualityscore.com/api/json/url/${process.env.IP_QUALITY_SCORE_API_KEY}/${link}`,
     {
       headers: {
         Referer: "https://api.itsfishy.xyz",
@@ -70,7 +70,7 @@ export async function checkLink(link: string): Promise<CheckLinkResponse> {
   );
 
   const phishermanResponse = await axios.get(
-    `https://api.phisherman.gg/v2/domains/check/${flattenedLink}`,
+    `https://api.phisherman.gg/v2/domains/check/${link}`,
     {
       headers: {
         Authorization: "Bearer " + process.env.PHISHERMAN_API_KEY,
@@ -80,7 +80,7 @@ export async function checkLink(link: string): Promise<CheckLinkResponse> {
   );
 
   const sinkingYahtsResponse = await axios.get<boolean>(
-    `https://phish.sinking.yachts/v2/check/${flattenedLink}`,
+    `https://phish.sinking.yachts/v2/check/${link}`,
     {
       headers: {
         accept: "application/json",
@@ -90,7 +90,7 @@ export async function checkLink(link: string): Promise<CheckLinkResponse> {
   );
 
   const urlScanCheckSerch = await axios.get(
-    `https://urlscan.io/api/v1/search/?q=domain:${flattenedLink}`,
+    `https://urlscan.io/api/v1/search/?q=domain:${link}`,
     {
       headers: {
         "API-Key": process.env.URLSCAN_API_KEY,
@@ -116,7 +116,7 @@ export async function checkLink(link: string): Promise<CheckLinkResponse> {
     const scan = await axios.post(
       "https://urlscan.io/api/v1/scan/",
       {
-        url: flattenedLink,
+        url: link,
       },
       {
         headers: {
@@ -154,7 +154,7 @@ export async function checkLink(link: string): Promise<CheckLinkResponse> {
   }
 
   const checkVirusTotalAPI = await axios.get(
-    `https://www.virustotal.com/api/v3/domains/${flattenedLink}`,
+    `https://www.virustotal.com/api/v3/domains/${link}`,
     {
       headers: {
         "x-apikey": process.env.VIRUS_TOTAL_API_KEY,
@@ -189,6 +189,10 @@ export async function checkLink(link: string): Promise<CheckLinkResponse> {
       id: uuidv4(),
       link: link,
       flatLink: flattenedLink,
+      type: "Unclassified",
+      reason: "Flagged by external APIs",
+      reportedBy: "Internal || Checks Endpoint",
+      reportedByID: "000",
       dateReported: new Date(),
     });
 
@@ -198,6 +202,7 @@ export async function checkLink(link: string): Promise<CheckLinkResponse> {
       isScam: true,
       link: link,
       flattenedLink: flattenedLink,
+      reason: "Flagged by external APIs",
       localDbNative: false,
       externalApiResponses: {
         walshyAPI: `${checkWalshyAPI.data}`,

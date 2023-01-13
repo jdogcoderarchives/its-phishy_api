@@ -13,6 +13,7 @@ const router = express.Router();
  * @param {string} email.query.required - email of the user
  * @param {string} password.query.required - password of the user
  * @return {object} 200 - success response - application/json
+ * @return {object} 449 - Missing parameters response
  * @return {object} 400 - Bad request response
  */
 router.post("/signup", async (req, res) => {
@@ -20,7 +21,7 @@ router.post("/signup", async (req, res) => {
     // Validate the request body
     if (!req.body.email || !req.body.password) {
       return res
-        .status(400)
+        .status(449)
         .send({ message: "Email and password are required." });
     }
 
