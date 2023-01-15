@@ -13,7 +13,6 @@ const router = express.Router();
  * @param {string} email.query.required - email of the user
  * @param {string} password.query.required - password of the user
  * @return {object} 200 - success response - application/json
- * @return {object} 449 - Missing parameters response
  * @return {object} 400 - Bad request response
  */
 router.post("/signup", async (req, res) => {

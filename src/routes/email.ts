@@ -11,7 +11,6 @@ const router = express.Router();
  * @tags Main API Endpoints
  * @return {} 200 - success response - application/json
  * @return {object} 400 - Bad request response
- * @return {object} 449 - Missing parameters response
  * @return {object} 500 - Internal server error response
  * @param {string} email.query.required - The email to check
  */
