@@ -1,7 +1,7 @@
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 
-import { EmailModel } from "../../database/models/Email.schema";
+import { supabaseClient } from "../../index";
 
 /**
  * Checks various APIs to see if a email is a scam
@@ -12,11 +12,17 @@ export async function checkEmail(email: string) {
     throw new Error("No email provided");
   }
 
-  const emailExistsInDatabase = await EmailModel.exists({
-    email: email,
-  });
+  // check if domain exists in database (supabase)
+  const sup = await supabaseClient
+    .from("emails")
+    .select('email')
+    .eq('email', email)
 
-  if (emailExistsInDatabase) {
+if (!sup.data) {
+    throw new Error("Supabase error");
+  }
+
+  if (sup.data.length > 0) {
     return {
       isScam: true,
       email: email,
@@ -34,16 +40,22 @@ export async function checkEmail(email: string) {
   }
 
   if (checkIpQualityScore.data.disposable === true) {
-    const newEmail = new EmailModel({
+
+    const { error } = await supabaseClient
+    .from("emails")
+    .insert({
       id: uuidv4(),
       email: email,
       type: "disposable",
       reason: "Flagged as disposable by IPQualityScore",
       reportedBy: "Internal || Checks Endpoint",
-      reportedByID: "000",
-    });
+      reportedByID: "001",
+    })
+    .select();
 
-    await newEmail.save();
+  if (error) {
+    throw new Error(error.message);
+  }
 
     return {
       isScam: true,
@@ -54,16 +66,22 @@ export async function checkEmail(email: string) {
   }
 
   if (checkIpQualityScore.data.honeypot === true) {
-    const newEmail = new EmailModel({
+
+    const { error } = await supabaseClient
+    .from("emails")
+    .insert({
       id: uuidv4(),
       email: email,
       type: "honeypot",
       reason: "Flagged as honeypot by IPQualityScore",
       reportedBy: "Internal || Checks Endpoint",
-      reportedByID: "000",
-    });
+      reportedByID: "001",
+    })
+    .select();
 
-    await newEmail.save();
+  if (error) {
+    throw new Error(error.message);
+  }
 
     return {
       isScam: true,

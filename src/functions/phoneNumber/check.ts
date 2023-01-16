@@ -1,8 +1,4 @@
-import axios from "axios";
-import { v4 as uuidv4 } from "uuid";
-import validator from "validator";
-
-import { PhoneNumberModel } from "../../database/models/PhoneNumber.schema";
+import { supabaseClient } from "../../index";
 
 /**
  * Checks various APIs to see if a phone number is a scam
@@ -10,11 +6,17 @@ import { PhoneNumberModel } from "../../database/models/PhoneNumber.schema";
  */
 export async function checkPhoneNumber(phoneNumber: string) {
 
-  const phoneNumberExistsInDatabase = await PhoneNumberModel.exists({
-    phoneNumber: phoneNumber,
-  });
+  // check if domain exists in database (supabase)
+  const sup = await supabaseClient
+    .from("phoneNumbers")
+    .select('phoneNumber')
+    .eq('phoneNumber', phoneNumber)
 
-  if (phoneNumberExistsInDatabase) {
+if (!sup.data) {
+    throw new Error("Supabase error");
+  }
+
+  if (sup.data.length > 0) {
     return {
       isScam: true,
       phoneNumber: phoneNumber,
@@ -27,5 +29,6 @@ export async function checkPhoneNumber(phoneNumber: string) {
     isScam: false,
     phoneNumber: phoneNumber,
     localDbNative: false,
+    reason: "Not a scam",
   };
 }

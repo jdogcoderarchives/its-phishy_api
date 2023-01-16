@@ -1,45 +1,41 @@
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
-
-import { DomainModel } from "../../database/models/Domain.schema";
-import { flattenLink } from "../flattenLink";
+import { supabaseClient } from "../../index";
 
 /**
  * Checks various APIs to see if a domain is a scam
  * @param {string} domain The domain to check
  * @returns {Promise} The response
  */
-export async function checkDomain(
-  domain: string
-) {
+export async function checkDomain(domain: string) {
   if (!domain) {
     throw new Error("No domain provided");
   }
 
-  const flattenedDomain = flattenLink(domain);
+  // check if domain exists in database (supabase)
+  // const sup = await supabaseClient
+  //   .from("domains")
+  //   .select("domain")
+  //   .eq("domain", domain);
 
-  if (!flattenedDomain) {
-    throw new Error("No domain provided");
-  }
+  // if (!sup.data) {
+  //   throw new Error("Supabase error");
+  // }
 
-  const domainExistsInDatabase = await DomainModel.exists({
-    domain: flattenedDomain,
-  });
-
-  if (domainExistsInDatabase) {
-    return {
-      isScam: false,
-      domain: domain,
-      localDbNative: true,
-      reason: "Link exists in native database!",
-    };
-  }
+  // if (sup.data.length > 0) {
+  //   return {
+  //     isScam: true,
+  //     domain: domain,
+  //     localDbNative: true,
+  //     reason: "Link exists in native database!",
+  //   };
+  // }
 
   const checkWalshyAPI = await axios.post<{
     badDomain: boolean;
     detection: "discord" | "community";
   }>("https://bad-domains.walshy.dev/check", {
-    domain: flattenedDomain,
+    domain: domain,
   });
 
   const gooleSafeBrowsingResponse = await axios.post(
@@ -55,7 +51,7 @@ export async function checkDomain(
         threatEntryTypes: ["URL"],
         threatEntries: [
           {
-            url: flattenedDomain,
+            url: domain,
           },
         ],
       },
@@ -63,7 +59,7 @@ export async function checkDomain(
   );
 
   const ipQualityScoreResponse = await axios.get(
-    `https://ipqualityscore.com/api/json/url/${process.env.IP_QUALITY_SCORE_API_KEY}/${flattenedDomain}`,
+    `https://ipqualityscore.com/api/json/url/${process.env.IP_QUALITY_SCORE_API_KEY}/${domain}`,
     {
       headers: {
         Referer: "https://api.itsfishy.xyz",
@@ -72,7 +68,7 @@ export async function checkDomain(
   );
 
   const phishermanResponse = await axios.get(
-    `https://api.phisherman.gg/v2/domains/check/${flattenedDomain}`,
+    `https://api.phisherman.gg/v2/domains/check/${domain}`,
     {
       headers: {
         Authorization: "Bearer " + process.env.PHISHERMAN_API_KEY,
@@ -82,7 +78,7 @@ export async function checkDomain(
   );
 
   const sinkingYahtsResponse = await axios.get<boolean>(
-    `https://phish.sinking.yachts/v2/check/${flattenedDomain}`,
+    `https://phish.sinking.yachts/v2/check/${domain}`,
     {
       headers: {
         accept: "application/json",
@@ -92,7 +88,7 @@ export async function checkDomain(
   );
 
   const urlScanCheckSerch = await axios.get(
-    `https://urlscan.io/api/v1/search/?q=domain:${flattenedDomain}`,
+    `https://urlscan.io/api/v1/search/?q=domain:${domain}`,
     {
       headers: {
         "API-Key": process.env.URLSCAN_API_KEY,
@@ -104,21 +100,13 @@ export async function checkDomain(
   // eslint-disable-next-line init-declarations
   let urlScanResponse;
 
-  if (!urlScanCheckSerch?.data) {
-    throw new Error("urlScanCheckSerch.data is undefined");
-  }
-
-  if (!urlScanCheckSerch.data.results.length) {
-    throw new Error("urlScanCheckSerch.data.results is undefined");
-  }
-
   // check if the domain is not already scanned
   if (urlScanCheckSerch.data.results.length === 0) {
     // if not scan the domain, providing the api key
     const scan = await axios.post(
       "https://urlscan.io/api/v1/scan/",
       {
-        url: flattenedDomain,
+        url: domain,
       },
       {
         headers: {
@@ -151,12 +139,16 @@ export async function checkDomain(
     );
   }
 
+  if (!urlScanCheckSerch?.data) {
+    throw new Error("urlScanCheckSerch.data is undefined");
+  }
+
   if (!urlScanResponse?.data) {
     throw new Error("urlScanResponse.data is undefined");
   }
 
   const checkVirusTotalAPI = await axios.get(
-    `https://www.virustotal.com/api/v3/domains/${flattenedDomain}`,
+    `https://www.virustotal.com/api/v3/domains/${domain}`,
     {
       headers: {
         "x-apikey": process.env.VIRUS_TOTAL_API_KEY,
@@ -187,17 +179,22 @@ export async function checkDomain(
       checkVirusTotalAPI.data.data.attributes.last_analysis_stats.suspicious >=
       2
   ) {
-    const newDomain = new DomainModel({
-      id: uuidv4(),
-      domain: domain,
-      type: "Unclassified",
-      reason: "Flagged by external APIs",
-      reportedBy: "Internal || Checks Endpoint",
-      reportedByID: "000",
-      dateReported: new Date(),
-    });
+    const { error } = await supabaseClient
+      .from("domains")
+      .insert({
+        id: uuidv4(),
+        domain: domain,
+        dateReported: new Date(),
+        reason: "Flagged by external APIs",
+        reportedBy: "Internal checks (APIs)",
+        reportedByID: "001",
+        type: "Unclassfied",
+      })
+      .select();
 
-    await newDomain.save();
+    if (error) {
+      throw new Error(error.message);
+    }
 
     return {
       isScam: true,

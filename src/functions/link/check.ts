@@ -1,7 +1,8 @@
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 
-import { LinkModel } from "../../database/models/Link.schema";
+import { supabaseClient } from "../../index";
+import { flattenLink } from "../flattenLink";
 
 /**
  * Checks various APIs to see if a link is a scam
@@ -13,19 +14,25 @@ export async function checkLink(link: string) {
     throw new Error("No link provided");
   }
 
-  const flattenedLink = link;
+  const flattenedLink = flattenLink(link);
 
   if (!flattenedLink) {
     throw new Error("Flat link issue");
   }
 
-  const linkExistsInDatabase = await LinkModel.exists({
-    link: link,
-  });
+   // check if domain exists in database (supabase)
+   const sup = await supabaseClient
+   .from("links")
+   .select('link')
+   .eq('link', link)
 
-  if (linkExistsInDatabase) {
+if (!sup.data) {
+   throw new Error("Supabase error");
+ }
+
+ if (sup.data.length > 0) {
     return {
-      isScam: false,
+      isScam: true,
       link: link,
       flattenedLink: flattenedLink,
       localDbNative: true,
@@ -185,18 +192,22 @@ export async function checkLink(link: string) {
       checkVirusTotalAPI.data.data.attributes.last_analysis_stats.suspicious >=
       2
   ) {
-    const newLink = new LinkModel({
-      id: uuidv4(),
-      link: link,
-      flatLink: flattenedLink,
-      type: "Unclassified",
-      reason: "Flagged by external APIs",
-      reportedBy: "Internal || Checks Endpoint",
-      reportedByID: "000",
-      dateReported: new Date(),
-    });
+    const { error } = await supabaseClient
+    .from("links")
+    .insert({
+        id: uuidv4(),
+        link: link,
+        flatLink: flattenedLink,
+        type: "Unclassified",
+        reason: "Flagged by external APIs",
+        reportedBy: "Internal || Checks Endpoint",
+        reportedByID: "001",
+        dateReported: new Date(),
+      });
 
-    await newLink.save();
+    if (error) {
+      throw new Error(error.message);
+    }
 
     return {
       isScam: true,

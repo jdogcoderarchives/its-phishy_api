@@ -5,7 +5,6 @@ import domainRoutes from "./domain";
 import emailRoutes from "./email";
 import linkRoutes from "./link";
 import phoneNumberRoutes from "./phoneNumber";
-import userRoutes from "./user";
 
 const router = express.Router();
 
@@ -44,7 +43,6 @@ router.get("/privacy", (req, res) => {
   res.sendFile("privacy.html", { root: "./src/public/html" });
 });
 
-router.use("/user", userRoutes);
 router.use("/link", linkRoutes);
 router.use("/domain", domainRoutes);
 router.use("/email", emailRoutes);
