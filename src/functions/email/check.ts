@@ -15,10 +15,10 @@ export async function checkEmail(email: string) {
   // check if domain exists in database (supabase)
   const sup = await supabaseClient
     .from("emails")
-    .select('email')
-    .eq('email', email)
+    .select("email")
+    .eq("email", email);
 
-if (!sup.data) {
+  if (!sup.data) {
     throw new Error("Supabase error");
   }
 
@@ -40,21 +40,20 @@ if (!sup.data) {
   }
 
   if (checkIpQualityScore.data.disposable === true) {
-
     const { error } = await supabaseClient
-    .from("emails")
-    .insert({
-      id: uuidv4(),
-      email: email,
-      type: "disposable",
-      reason: "Flagged as disposable by IPQualityScore",
-      reportedByID: 1,
-    })
-    .select();
+      .from("emails")
+      .insert({
+        id: uuidv4(),
+        email: email,
+        type: "disposable",
+        reason: "Flagged as disposable by IPQualityScore",
+        reportedByID: 1,
+      })
+      .select();
 
-  if (error) {
-    throw new Error(error.message);
-  }
+    if (error) {
+      throw new Error(error.message);
+    }
 
     return {
       isScam: true,
@@ -65,21 +64,20 @@ if (!sup.data) {
   }
 
   if (checkIpQualityScore.data.honeypot === true) {
-
     const { error } = await supabaseClient
-    .from("emails")
-    .insert({
-      id: uuidv4(),
-      email: email,
-      type: "honeypot",
-      reason: "Flagged as honeypot by IPQualityScore",
-      reportedByID: 1,
-    })
-    .select();
+      .from("emails")
+      .insert({
+        id: uuidv4(),
+        email: email,
+        type: "honeypot",
+        reason: "Flagged as honeypot by IPQualityScore",
+        reportedByID: 1,
+      })
+      .select();
 
-  if (error) {
-    throw new Error(error.message);
-  }
+    if (error) {
+      throw new Error(error.message);
+    }
 
     return {
       isScam: true,

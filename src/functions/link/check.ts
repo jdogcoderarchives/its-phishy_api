@@ -21,17 +21,17 @@ export async function checkLink(link: string): Promise<any> {
     throw new Error("Flat link issue");
   }
 
-   // check if domain exists in database (supabase)
-   const sup = await supabaseClient
-   .from("links")
-   .select('link')
-   .eq('link', link)
+  // check if domain exists in database (supabase)
+  const sup = await supabaseClient
+    .from("links")
+    .select("link")
+    .eq("link", link);
 
-if (!sup.data) {
-   throw new Error("Supabase error");
- }
+  if (!sup.data) {
+    throw new Error("Supabase error");
+  }
 
- if (sup.data.length > 0) {
+  if (sup.data.length > 0) {
     return {
       isScam: true,
       link: link,
@@ -193,17 +193,15 @@ if (!sup.data) {
       checkVirusTotalAPI.data.data.attributes.last_analysis_stats.suspicious >=
       2
   ) {
-    const { error } = await supabaseClient
-    .from("links")
-    .insert({
-        id: uuidv4(),
-        link: link,
-        flatLink: flattenedLink,
-        type: "Unclassified",
-        reason: "Flagged by external APIs",
-        reportedByID: 1,
-        dateReported: new Date(),
-      });
+    const { error } = await supabaseClient.from("links").insert({
+      id: uuidv4(),
+      link: link,
+      flatLink: flattenedLink,
+      type: "Unclassified",
+      reason: "Flagged by external APIs",
+      reportedByID: 1,
+      dateReported: new Date(),
+    });
 
     if (error) {
       throw new Error(error.message);

@@ -51,9 +51,9 @@ router.get("/check", async (req, res) => {
 
   if (!rsp) {
     return res.status(500).json({
-        error: "Something went wrong",
+      error: "Something went wrong",
     });
-    }
+  }
 
   if (rsp.isScam) {
     return res.status(200).json({

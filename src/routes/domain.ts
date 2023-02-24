@@ -36,7 +36,6 @@ router.get("/check", async (req, res) => {
     });
   }
 
-
   if (url === null || url === undefined || !url) {
     return res.status(500).json({
       error: "Something went wrong",

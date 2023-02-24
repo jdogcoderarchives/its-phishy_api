@@ -12,7 +12,7 @@ export async function checkDomain(domain: string) {
     throw new Error("No domain provided");
   }
 
- // check if domain exists in database (supabase)
+  // check if domain exists in database (supabase)
   const sup = await supabaseClient
     .from("domains")
     .select("domain")

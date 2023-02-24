@@ -5,14 +5,13 @@ import { supabaseClient } from "../../index";
  * @param {string} phoneNumber The phone number to check
  */
 export async function checkPhoneNumber(phoneNumber: string) {
-
   // check if domain exists in database (supabase)
   const sup = await supabaseClient
     .from("phoneNumbers")
-    .select('phoneNumber')
-    .eq('phoneNumber', phoneNumber)
+    .select("phoneNumber")
+    .eq("phoneNumber", phoneNumber);
 
-if (!sup.data) {
+  if (!sup.data) {
     throw new Error("Supabase error");
   }
 
