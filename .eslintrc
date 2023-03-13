@@ -1,6 +1,6 @@
 {
 	"env": {
-		"es2021": true,
+		"ESnext": true,
 		"node": true
 	},
 	"extends": [
@@ -18,10 +18,12 @@
 		"sourceType": "module"
 	},
 	"plugins": [
+		"prettier",
 		"@typescript-eslint",
 		"import"
 	],
 	"rules": {
+		"prettier/prettier": ["error"],
 		"prefer-const": "error",
 		"eqeqeq": [
 			"error",
@@ -78,7 +80,7 @@
 			"unix"
 		],
 		"quotes": [
-			"error",
+			"warn",
 			"single"
 		],
 		"semi": [
