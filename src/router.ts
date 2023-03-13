@@ -9,13 +9,14 @@ const router = express.Router();
 
 /**
  * GET /
- * @summary The Root endpoint, simply returns "Hello World!"
+ * @summary The Root endpoint, simply redirects to the documentation page
  * @tags Main API Endpoints
  * @return {object} 200 - success response - application/json
  * @return {object} 400 - Bad request response
  */
 router.get("/", (req, res) => {
-  res.send("Hello World!");
+  // redirect to the documentation page
+  res.redirect("/docs");
 });
 
 /**
