@@ -1,7 +1,7 @@
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 
-import { supabaseClient } from "../../index";
+import { query } from "../../db/index";
 import { flattenLink } from "../flattenLink";
 
 /**
@@ -9,7 +9,6 @@ import { flattenLink } from "../flattenLink";
  * @param {string} link The link to check
  * @returns {Promise} The response
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function checkLink(link: string): Promise<any> {
   if (!link) {
     throw new Error("No link provided");
@@ -21,17 +20,12 @@ export async function checkLink(link: string): Promise<any> {
     throw new Error("Flat link issue");
   }
 
-  // check if domain exists in database (supabase)
-  const sup = await supabaseClient
-    .from("links")
-    .select("link")
-    .eq("link", link);
+  // check if domain exists in database
+  const dbdata = await query("SELECT * FROM links WHERE link = $1", [
+    flattenedLink,
+  ]);
 
-  if (!sup.data) {
-    throw new Error("Supabase error");
-  }
-
-  if (sup.data.length > 0) {
+  if (dbdata.rows.length > 0) {
     return {
       isScam: true,
       link: link,
@@ -107,7 +101,6 @@ export async function checkLink(link: string): Promise<any> {
     }
   );
 
-  // eslint-disable-next-line init-declarations
   let urlScanResponse;
 
   if (!urlScanCheckSerch?.data) {
@@ -193,18 +186,22 @@ export async function checkLink(link: string): Promise<any> {
       checkVirusTotalAPI.data.data.attributes.last_analysis_stats.suspicious >=
       2
   ) {
-    const { error } = await supabaseClient.from("links").insert({
-      id: uuidv4(),
-      link: link,
-      flatLink: flattenedLink,
-      type: "Unclassified",
-      reason: "Flagged by external APIs",
-      reportedByID: 1,
-      dateReported: new Date(),
-    });
+    // insert the link into the database
+    const dbinsert = await query(
+      "INSERT INTO links (id, link, flatLink, type, reason, reportedByID, dateReported) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+      [
+        uuidv4(),
+        link,
+        flattenedLink,
+        "Unclassified",
+        "Flagged by external APIs",
+        1,
+        new Date(),
+      ]
+    );
 
-    if (error) {
-      throw new Error(error.message);
+    if (dbinsert.rows.length > 0) {
+      throw new Error("Database error");
     }
 
     return {

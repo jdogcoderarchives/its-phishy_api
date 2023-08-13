@@ -1,6 +1,6 @@
 {
 	"env": {
-		"ESnext": true,
+		"es2021": true,
 		"node": true
 	},
 	"extends": [
@@ -23,7 +23,12 @@
 		"import"
 	],
 	"rules": {
-		"prettier/prettier": ["error"],
+		"no-multi-spaces": [
+			"error"
+		],
+		"prettier/prettier": [
+			"error"
+		],
 		"prefer-const": "error",
 		"eqeqeq": [
 			"error",
@@ -52,18 +57,37 @@
 		"import/exports-last": "warn",
 		"import/newline-after-import": "warn",
 		"import/order": [
-			"warn",
+			1,
 			{
 				"groups": [
-					"builtin",
 					"external",
+					"builtin",
 					"internal",
-					"parent",
 					"sibling",
-					"index",
-					"object",
-					"type",
-					"unknown"
+					"parent",
+					"index"
+				],
+				"pathGroups": [
+					{
+						"pattern": "components",
+						"group": "internal"
+					},
+					{
+						"pattern": "common",
+						"group": "internal"
+					},
+					{
+						"pattern": "routes/ **",
+						"group": "internal"
+					},
+					{
+						"pattern": "assets/**",
+						"group": "internal",
+						"position": "after"
+					}
+				],
+				"pathGroupsExcludedImportTypes": [
+					"internal"
 				],
 				"alphabetize": {
 					"order": "asc",

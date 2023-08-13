@@ -1,18 +1,18 @@
-// import * as http from 'http';
-// import App from './app';
+import colors from 'colors';
+import * as http from 'http';
+import App from './app';
+import * as logger from './utils/logger';
+import * as dotenv from "dotenv";
+dotenv.config();
 
-// const port = process.env.PORT || 3070;
+const port = process.env.PORT || 3070;
 
-// App.set('port', port);
-// const server = http.createServer(App);
-// server.listen(port);
+App.set('port', port);
+const server = http.createServer(App);
+server.listen(port);
 
-// const logger = new APILogger();
-
-// server.on('listening', function(): void {
-//	const addr = server.address();
-//	const bind = (typeof addr === 'string') ? `pipe ${addr}` : `port ${addr.port}`;
-//logger.info(`Listening on ${bind}`, null);
-// });
-
-// module.exports = App;
+server.on('listening', function (): void {
+	const addr = server.address();
+	const bind = typeof addr === 'string' ? `pipe ${addr}` : `port ${addr!.port}`;
+	logger.info(`Listening on ${bind}`);
+});

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 
-import { supabaseClient } from "../../index";
+import { query } from "../../db/index";
 
 /**
  * Checks various APIs to see if a email is a scam
@@ -12,17 +12,13 @@ export async function checkEmail(email: string) {
     throw new Error("No email provided");
   }
 
-  // check if domain exists in database (supabase)
-  const sup = await supabaseClient
-    .from("emails")
-    .select("email")
-    .eq("email", email);
+  // check if domain exists in database
 
-  if (!sup.data) {
-    throw new Error("Supabase error");
-  }
+  const dbdata = await query("SELECT * FROM emails WHERE email = $1", [
+    email,
+  ]);
 
-  if (sup.data.length > 0) {
+  if (dbdata.rows.length > 0) {
     return {
       isScam: true,
       email: email,
@@ -40,19 +36,20 @@ export async function checkEmail(email: string) {
   }
 
   if (checkIpQualityScore.data.disposable === true) {
-    const { error } = await supabaseClient
-      .from("emails")
-      .insert({
-        id: uuidv4(),
-        email: email,
-        type: "disposable",
-        reason: "Flagged as disposable by IPQualityScore",
-        reportedByID: 1,
-      })
-      .select();
 
-    if (error) {
-      throw new Error(error.message);
+    const dbinsert1 = await query(
+      "INSERT INTO emails (id, email, type, reason, reported_by_id) VALUES ($1, $2, $3, $4, $5)",
+      [
+        uuidv4(),
+        email,
+        "disposable",
+        "Flagged as disposable by IPQualityScore",
+        1,
+      ]
+    );
+
+    if (dbinsert1.rows.length > 0) {
+      throw new Error("Database error");
     }
 
     return {
@@ -64,19 +61,21 @@ export async function checkEmail(email: string) {
   }
 
   if (checkIpQualityScore.data.honeypot === true) {
-    const { error } = await supabaseClient
-      .from("emails")
-      .insert({
-        id: uuidv4(),
-        email: email,
-        type: "honeypot",
-        reason: "Flagged as honeypot by IPQualityScore",
-        reportedByID: 1,
-      })
-      .select();
 
-    if (error) {
-      throw new Error(error.message);
+    const dbinsert2 = await query(
+      "INSERT INTO emails (id, email, type, reason, reported_by_id) VALUES ($1, $2, $3, $4, $5)",
+      [
+        uuidv4(),
+        email,
+        "honeypot",
+        "Flagged as honeypot by IPQualityScore",
+        1,
+      ]
+    );
+
+
+    if (dbinsert2.rows.length > 0) {
+      throw new Error("Database error");
     }
 
     return {

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
-import { supabaseClient } from "../../index";
+
+import { query } from "../../db/index";
 
 /**
  * Checks various APIs to see if a domain is a scam
@@ -12,17 +13,12 @@ export async function checkDomain(domain: string) {
     throw new Error("No domain provided");
   }
 
-  // check if domain exists in database (supabase)
-  const sup = await supabaseClient
-    .from("domains")
-    .select("domain")
-    .eq("domain", domain);
+  // check if domain exists in database
+  const dbdata = await query("SELECT * FROM domains WHERE domain = $1", [
+    domain,
+  ]);
 
-  if (!sup.data) {
-    throw new Error("Supabase error");
-  }
-
-  if (sup.data.length > 0) {
+  if (dbdata.rows.length > 0) {
     return {
       isScam: true,
       domain: domain,
@@ -97,7 +93,6 @@ export async function checkDomain(domain: string) {
     }
   );
 
-  // eslint-disable-next-line init-declarations
   let urlScanResponse;
 
   // check if the domain is not already scanned
@@ -179,17 +174,17 @@ export async function checkDomain(domain: string) {
       checkVirusTotalAPI.data.data.attributes.last_analysis_stats.suspicious >=
       2
   ) {
-    const { error } = await supabaseClient
-      .from("domains")
-      .insert({
-        id: uuidv4(),
-        domain: domain,
-        dateReported: new Date(),
-        reason: "Flagged by external APIs",
-        type: "Unclassfied",
-        reportedByID: 1,
-      })
-      .select();
+    const dbinsert = await query(
+      "INSERT INTO domains (id, domain, dateReported, reason, type, reportedByID) VALUES ($1, $2, $3, $4, $5, $6)",
+      [
+        uuidv4(),
+        domain,
+        new Date(),
+        "Flagged by external APIs",
+        "Unclassfied",
+        1,
+      ]
+    );
 
     axios.post("https://yuri.bots.lostluma.dev/phish/report", {
       headers: {
@@ -201,8 +196,8 @@ export async function checkDomain(domain: string) {
       },
     });
 
-    if (error) {
-      throw new Error(error.message);
+    if (dbinsert.rows.length > 0) {
+      throw new Error("Database error");
     }
 
     return {
