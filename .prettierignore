@@ -6,3 +6,4 @@ dist
 .eslintignore
 .prettierrc
 .prettierignore
+resources/empty_db.sql

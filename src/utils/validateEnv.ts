@@ -15,7 +15,6 @@ export const validateEnv = (): { valid: boolean; message: string } => {
 		return { valid: false, message: 'Missing Database URL' };
 	}
 
-
 	if (!process.env.YURI_API_KEY) {
 		return { valid: false, message: 'Missing Yuri API Key' };
 	}

@@ -1,7 +1,7 @@
-import * as express from "express";
-import validator from "validator";
+import * as express from 'express';
+import validator from 'validator';
 
-import { checkPhoneNumber } from "../functions/phoneNumber/check";
+import { checkPhoneNumber } from '../functions/phoneNumber/check';
 
 const router = express.Router();
 
@@ -14,57 +14,57 @@ const router = express.Router();
  * @return {object} 500 - Internal server error response
  * @param {string} phoneNumber.query.required - The phone number to check
  */
-router.get("/check", async (req, res) => {
-  const rawPhoneNumber = req.query.phoneNumber as string;
+router.get('/check', async (req, res) => {
+	const rawPhoneNumber = req.query.phoneNumber as string;
 
-  if (!rawPhoneNumber) {
-    return res.status(449).json({
-      error: "No phone number provided",
-    });
-  }
+	if (!rawPhoneNumber) {
+		return res.status(449).json({
+			error: 'No phone number provided',
+		});
+	}
 
-  let phoneNumber = null;
+	let phoneNumber = null;
 
-  if (validator.isMobilePhone(rawPhoneNumber)) {
-    phoneNumber = rawPhoneNumber;
-  } else {
-    return res.status(400).json({
-      error: "Phone number is not valid",
-    });
-  }
+	if (validator.isMobilePhone(rawPhoneNumber)) {
+		phoneNumber = rawPhoneNumber;
+	} else {
+		return res.status(400).json({
+			error: 'Phone number is not valid',
+		});
+	}
 
-  if (phoneNumber === null || phoneNumber === undefined || !phoneNumber) {
-    return res.status(500).json({
-      error: "Something went wrong",
-    });
-  }
+	if (phoneNumber === null || phoneNumber === undefined || !phoneNumber) {
+		return res.status(500).json({
+			error: 'Something went wrong',
+		});
+	}
 
-  const rsp = await checkPhoneNumber(phoneNumber);
+	const rsp = await checkPhoneNumber(phoneNumber);
 
-  if (!rsp) {
-    return res.status(500).json({
-      error: "Something went wrong",
-    });
-  }
+	if (!rsp) {
+		return res.status(500).json({
+			error: 'Something went wrong',
+		});
+	}
 
-  if (rsp.isScam) {
-    return res.status(200).json({
-      isScam: true,
-      phoneNumber: phoneNumber,
-      localDbNative: rsp.localDbNative,
-      reason: rsp.reason,
-    });
-  } else if (!rsp.isScam) {
-    return res.status(200).json({
-      isScam: false,
-      phoneNumber: phoneNumber,
-      localDbNative: rsp.localDbNative,
-    });
-  } else {
-    return res.status(500).json({
-      error: "Something went wrong",
-    });
-  }
+	if (rsp.isScam) {
+		return res.status(200).json({
+			isScam: true,
+			phoneNumber: phoneNumber,
+			localDbNative: rsp.localDbNative,
+			reason: rsp.reason,
+		});
+	} else if (!rsp.isScam) {
+		return res.status(200).json({
+			isScam: false,
+			phoneNumber: phoneNumber,
+			localDbNative: rsp.localDbNative,
+		});
+	} else {
+		return res.status(500).json({
+			error: 'Something went wrong',
+		});
+	}
 });
 
 export default router;

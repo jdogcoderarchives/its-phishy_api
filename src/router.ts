@@ -1,9 +1,9 @@
 import * as express from 'express';
 
-import domainRoutes from "./routes/domain";
-import emailRoutes from "./routes/email";
-import linkRoutes from "./routes/link";
-import phoneNumberRoutes from "./routes/phoneNumber";
+import domainRoutes from './routes/domain';
+import emailRoutes from './routes/email';
+import linkRoutes from './routes/link';
+import phoneNumberRoutes from './routes/phoneNumber';
 
 const router = express.Router();
 
@@ -42,9 +42,9 @@ router.get('/privacy', (req, res) => {
 	res.sendFile('privacy.html', { root: './src/public/html' });
 });
 
-router.use("/link", linkRoutes);
-router.use("/domain", domainRoutes);
-router.use("/email", emailRoutes);
-router.use("/phonenumber", phoneNumberRoutes);
+router.use('/link', linkRoutes);
+router.use('/domain', domainRoutes);
+router.use('/email', emailRoutes);
+router.use('/phonenumber', phoneNumberRoutes);
 
 export default router;

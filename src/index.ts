@@ -1,8 +1,9 @@
 import colors from 'colors';
-import * as http from 'http';
-import App from './app';
-import * as logger from './utils/logger';
 import * as dotenv from "dotenv";
+import * as http from "http";
+import App from "./app";
+import * as logger from "./utils/logger";
+
 dotenv.config();
 
 const port = process.env.PORT || 3070;
